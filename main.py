@@ -7,7 +7,7 @@ from discord.ext.commands import Bot
 BOT_PREFIX = "?"
 TOKEN = "NTczMjczOTU4ODE2OTQwMDMy.XModJQ.0Rp0mkcGMVqTjr24mMT4Ok2AwMM"  # Get at discordapp.com/developers/applications/me
 
-
+extensions = ['cogs.generalStuff']
 class MehBot(Bot):
     def __init__(self):
         super().__init__(command_prefix=BOT_PREFIX,
@@ -81,4 +81,9 @@ class MehBot(Bot):
 
 if __name__ == '__main__':
     mehBot = MehBot()
+    for extension in extensions:
+        try:
+            mehBot.load_extension(extension)
+        except Exception as error:
+            print('{} cannot be loaded. [{}]'.format((extension, error)))
     mehBot.run()
