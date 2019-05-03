@@ -1,6 +1,7 @@
 import sqlite3
 import uuid
 import random
+import os
 
 conn = sqlite3.connect('botdb.sqlite')
 cur = conn.cursor()
@@ -29,19 +30,42 @@ def tsv2sqlite(filepath, tablename):
             cur.execute('INSERT INTO {tablename} (pk, category, value) VALUES (\'{pk}\', \'{category}\', \'{value}\')'\
                         .format(tablename=tablename, pk= str(uuid.uuid4()), category=parts[0], value=parts[1].rstrip()))
 
+categoryList = []
+
+def file2sqlite(filename, tablename, category):
+    with open(filename, encoding='utf8') as f:
+        count = 0
+        for line in f:
+            if count > 500:
+                return
+            count = count+1
+            print ("INSERT INTO {tablename} (pk, category, value) VALUES (\"{pk}\", \"{category}\", \"{value}\")"\
+                        .format(tablename=tablename, pk= str(uuid.uuid4()), category= category, value=line.rstrip()))
+            cur.execute("INSERT INTO {tablename} (pk, category, value) VALUES (\"{pk}\", \"{category}\", \"{value}\")"\
+                        .format(tablename=tablename, pk= str(uuid.uuid4()), category= category, value=line.rstrip().replace("'", "\'")))
 
 
-tsv2sqlite("D:\personal_git\wallpapers.tsv", "pictures")
-tsv2sqlite("D:\personal_git\memes.tsv", "pictures")
+for dir in os.listdir("."):
+    parts = dir.split("_")
+    tempCate = parts[-1]
+    if tempCate in categoryList:
+        tempCate = parts[-2]+"_"+parts[-1]
+        if tempCate in categoryList:
+            continue
+    categoryList.append(tempCate)
+    for r, d, f in os.walk(dir):
+        for file in f:
+            if '.txt' in file:
+                file2sqlite(os.path.join(r, file), "pictures", tempCate)
+
+# tsv2sqlite("D:\personal_git\wallpapers.tsv", "pictures")
+# tsv2sqlite("D:\personal_git\memes.tsv", "pictures")
 conn.commit()
 
-cur.execute('select value from memes where category=\'sacred\'')
+cur.execute('select count(*) from pictures')
 values=[x[0] for x in cur.fetchall()]
 
 cur.execute('select value from {tablename} where category=\'{category}\''.format(tablename= "memes"
                                                                                       , category="sacred"))
-values = [x[0] for x in cur.fetchall()]
-print (random.choice(values))
-
 
 conn.close()
