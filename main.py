@@ -1,7 +1,8 @@
 from discord.ext.commands import Bot
 
 BOT_PREFIX = "?"
-TOKEN = "NTczMjczOTU4ODE2OTQwMDMy.XModJQ.0Rp0mkcGMVqTjr24mMT4Ok2AwMM"  # Get at discordapp.com/developers/applications/me
+TOKEN = "your_token"  # Get at discordapp.com/developers/applications/me
+
 
 extensions = ['cogs.GeneralStuff']
 class MehBot(Bot):
